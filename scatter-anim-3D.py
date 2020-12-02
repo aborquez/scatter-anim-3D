@@ -73,7 +73,7 @@ def main(data, save=False):
 
     # Number of iterations
     iterations = len(data)
-
+    
     # Setting the axes properties
     ax.set_xlim3d([-0.1, 0.1])
     ax.set_xlabel('X')
@@ -87,7 +87,7 @@ def main(data, save=False):
     ax.set_title('3D Animated Scatter Example')
 
     # Provide starting angle for the view.
-    ax.view_init(25, 10)
+    ax.view_init(25, 10) # (azim, elev)
 
     ani = animation.FuncAnimation(fig, animate_scatters, iterations, fargs=(data, scatters),
                                        interval=1, blit=False, repeat=True)
