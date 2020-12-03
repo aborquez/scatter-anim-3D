@@ -7,7 +7,7 @@ import matplotlib.animation as animation
 
 # Functions
 
-def read_data(filename):
+def read_data(filename, speed):
     """
     Arguments:
         filename (string): name of the datafile.
@@ -22,7 +22,7 @@ def read_data(filename):
     with open(filename) as f:
         first_line = f.readline().strip().split(':')
     N = (len(first_line)-1)/3
-    
+
     start_positions = np.array(map(float, first_line[1:3*N+1])).reshape(N, 3)
     
     # define list of arrays
@@ -32,9 +32,10 @@ def read_data(filename):
     line_counter = 0
     for current_line in ff:
         if line_counter > 0: # prevent first line, that was already read
-            line_list     = current_line.strip().split(':')
-            new_positions = np.array(map(float, line_list[1:3*N+1])).reshape(N, 3)
-            data.append(new_positions)
+            if line_counter % speed == 0:
+                line_list     = current_line.strip().split(':')
+                new_positions = np.array(map(float, line_list[1:3*N+1])).reshape(N, 3)
+                data.append(new_positions)
         line_counter = line_counter + 1
     ff.close()
     return data
@@ -50,7 +51,7 @@ def animate_scatters(iteration, data, scatters):
 
     Returns:
         list: List of scatters (One per element) with new coordinates
-    """
+    """    
     for i in range(data[0].shape[0]):
         scatters[i]._offsets3d = (data[iteration][i,0:1], data[iteration][i,1:2], data[iteration][i,2:])
     return scatters
@@ -94,12 +95,13 @@ def main(data, save=False):
 
     if save:
         Writer = animation.writers['ffmpeg']
-        writer = Writer(fps=30, metadata=dict(artist='Me'), bitrate=1800, extra_args=['-vcodec', 'libx264'])
+        writer = Writer(fps=60, metadata=dict(artist='Me'), bitrate=1800, extra_args=['-vcodec', 'libx264'])
         ani.save('3d-scatted-animated.mp4', writer=writer)
 
     plt.show()
 
 # Program
-    
-data = read_data('out.txt')
+
+speed = int(raw_input('choose speed (1 <= int <= 20) : '))
+data = read_data('out.txt', speed)
 main(data, save=False)
